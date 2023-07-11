@@ -5,7 +5,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import Select, WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 class ExtractMissingPersonsUrls:
@@ -15,7 +14,7 @@ class ExtractMissingPersonsUrls:
 
     URL: str = "https://missingpersons.police.uk/en-gb/case-search/"
 
-    def __init__(self, driver: webdriver.Chrome = None):
+    def __init__(self, driver: webdriver.Chrome):
         """
         Initializes the ExtractMissingPersonsUrls class by setting up the Selenium driver and navigating to the URL.
         """
@@ -25,7 +24,6 @@ class ExtractMissingPersonsUrls:
         self.driver__init__()
 
     def driver__init__(self):
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.driver.get(self.URL)
         self._ignore_warning_box()
         self._expand_to_100_items()
@@ -78,5 +76,4 @@ class ExtractMissingPersonsUrls:
             for tag in case_url_tags:
                 self.case_urls.append(tag.get_attribute("href"))
 
-        self.driver.close()
         return self.case_urls

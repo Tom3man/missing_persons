@@ -17,7 +17,10 @@ class EngineerRawData:
         Returns:
             Formatted case number string
         """
-        return ''.join(char for char in case_number_str if char in string.digits + string.punctuation)
+        allowed_chars = string.digits + string.punctuation
+        return ''.join(
+            char for char in case_number_str if char in allowed_chars
+        )
 
     @staticmethod
     def split_age_range(age_range_str: str) -> Dict[str, int]:

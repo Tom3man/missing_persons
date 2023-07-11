@@ -1,20 +1,32 @@
 import sys
+from datetime import date
 
-folder_path = '../'
-sys.path.append(folder_path)
-
+import chromedriver_autoinstaller
 import pandas as pd
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
-from common import BuildRawData, EngineerRawData, ExtractMissingPersonsUrls
 
 
 def main():
 
+    todays_date = date.today().strftime("%Y_%m_%d")
+    FILE_NAME: str = f'missing_persons_{todays_date}.csv'
+
+    folder_path = '../../'
+    sys.path.append(folder_path)
+
+    import missing_individuals.utils.utils as utils
+
+    from missing_individuals import (BuildRawData, EngineerRawData,
+                                     ExtractMissingPersonsUrls)
+
+    data_path, chromedriver_path = utils.build_dirs()
+
+    
+    chromedriver_autoinstaller.install(path=chromedriver_path)
+    driver = webdriver.Chrome()
+
     # Extract all URLs
-    extract = ExtractMissingPersonsUrls()
+    extract = ExtractMissingPersonsUrls(driver=driver)
     case_urls = extract.extract_case_urls()
 
     full_df = pd.DataFrame()
@@ -22,7 +34,6 @@ def main():
 
         print(f"Running for URL {n} out of {len(case_urls)}")
 
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         driver.get(url)
 
         # Build raw dict
@@ -40,7 +51,7 @@ def main():
         # Concatenate row_df to full_df
         full_df = pd.concat([full_df, row_df], ignore_index=True)
 
-    full_df.to_csv("output.csv", index=False)
+    full_df.to_csv(f"{data_path}/{FILE_NAME}", index=False)
 
 
 if __name__ == "__main__":
