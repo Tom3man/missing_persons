@@ -21,7 +21,6 @@ def main():
 
     data_path, chromedriver_path = utils.build_dirs()
 
-    
     chromedriver_autoinstaller.install(path=chromedriver_path)
     driver = webdriver.Chrome()
 
