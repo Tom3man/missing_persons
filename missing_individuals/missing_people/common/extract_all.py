@@ -63,40 +63,43 @@ class ExtractMissingPeople:
         self.df_full = pd.DataFrame()
         for url in self.url_list:
 
-            self.driver.get(url=url)
-            self.close_pop_up()
+            try:
+                self.driver.get(url=url)
+                self.close_pop_up()
 
-            self.item_dict = {}
+                self.item_dict = {}
 
-            # Extract the main content
-            main_content = WebDriverWait(
-                self.driver, 5).until(
-                    ec.visibility_of_any_elements_located(
-                        (By.CLASS_NAME, 'main_content_cell')))[0]
-
-            # Get name
-            self.item_dict["NAME"] = WebDriverWait(
-                main_content, 5).until(
-                    ec.visibility_of_any_elements_located(
-                        (By.TAG_NAME, 'h1')))[0].text
-
-            item_content = WebDriverWait(
-                main_content, 5).until(
-                    ec.visibility_of_any_elements_located(
-                        (By.TAG_NAME, 'li')))
-
-            for item in item_content[:-2]:
-
-                item_name = WebDriverWait(
-                    item, 5).until(
+                # Extract the main content
+                main_content = WebDriverWait(
+                    self.driver, 5).until(
                         ec.visibility_of_any_elements_located(
-                            (By.TAG_NAME, 'h2')))[0].text
-                item_value = WebDriverWait(
+                            (By.CLASS_NAME, 'main_content_cell')))[0]
+
+                # Get name
+                self.item_dict["NAME"] = WebDriverWait(
+                    main_content, 5).until(
+                        ec.visibility_of_any_elements_located(
+                            (By.TAG_NAME, 'h1')))[0].text
+
+                item_content = WebDriverWait(
+                    main_content, 5).until(
+                        ec.visibility_of_any_elements_located(
+                            (By.TAG_NAME, 'li')))
+
+                for item in item_content[:-2]:
+
+                    item_name = WebDriverWait(
                         item, 5).until(
                             ec.visibility_of_any_elements_located(
-                                (By.TAG_NAME, 'span')))[0].text
+                                (By.TAG_NAME, 'h2')))[0].text
+                    item_value = WebDriverWait(
+                            item, 5).until(
+                                ec.visibility_of_any_elements_located(
+                                    (By.TAG_NAME, 'span')))[0].text
 
-                self.item_dict[item_name] = item_value
+                    self.item_dict[item_name] = item_value
+            except Exception as e:
+                pass
 
         self.df_full = pd.concat(
             [self.df_full, pd.DataFrame(self.item_dict, index=[0])])
